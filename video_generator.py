@@ -8,10 +8,10 @@ from video_effects import (
     create_background_clip, apply_disintegrate_effect, apply_reintegrate_effect
 )
 
-def generate_video(template, images, text_overlays, audio_file, output_path):
+def generate_video(template, images, text_overlays, audio_file, output_path, background_color=None):
     video_size = (1280, 720)
     duration = template['duration']
-    bg_color = template.get('bg_color', (30, 60, 114))
+    bg_color = background_color if background_color is not None else template.get('bg_color', (30, 60, 114))
     
     background = create_background_clip(duration, video_size, bg_color)
     
