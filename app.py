@@ -199,15 +199,24 @@ def preview_video(filename):
 
 @app.route('/generate_sora_video', methods=['POST'])
 def generate_sora_video_route():
-    """Generate video using OpenAI Sora API"""
+    """Generate video using OpenAI Sora or Replicate API"""
     try:
-        data = request.get_json()
+        # Handle JSON request
+        if request.is_json:
+            data = request.get_json()
+        else:
+            return jsonify({'error': 'Request must be JSON'}), 400
+            
         if not data:
             return jsonify({'error': 'Invalid JSON request body'}), 400
 
-        prompt = data.get('prompt', '')
+        prompt = data.get('prompt', '').strip()
+        if not prompt:
+            return jsonify({'error': 'Prompt is required'}), 400
+
         try:
             duration = int(data.get('duration', 8))
+            duration = max(4, min(20, duration))
         except (ValueError, TypeError):
             return jsonify({'error': 'Invalid duration value'}), 400
 
@@ -215,72 +224,56 @@ def generate_sora_video_route():
         use_image = data.get('use_image', False)
         api_provider = data.get('api_provider', 'sora')
 
-        if not prompt:
-            return jsonify({'error': 'Prompt is required'}), 400
-
-        duration = max(4, min(20, duration))
-
-        video_filename = f"sora_{uuid.uuid4()}.mp4"
+        video_filename = f"{api_provider}_{uuid.uuid4()}.mp4"
         video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
 
         # Get session API keys
         session_openai_key = session.get('openai_api_key')
         session_replicate_key = session.get('replicate_api_key')
 
-        if use_image and 'image' in request.files:
-            image_file = request.files['image']
-            if image_file and image_file.filename:
-                image_filename = secure_filename(f"{uuid.uuid4()}_{image_file.filename}")
-                image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-                image_file.save(image_path)
+        print(f"Generating video with {api_provider}")
+        print(f"Prompt: {prompt}")
+        print(f"Duration: {duration}s, Size: {size}")
+        print(f"Session OpenAI key present: {bool(session_openai_key)}")
+        print(f"Session Replicate key present: {bool(session_replicate_key)}")
 
-                result = generate_video_with_image(
-                    prompt=prompt,
-                    image_path=image_path,
-                    duration=duration,
-                    size=size,
-                    output_path=video_path,
-                    session_api_key=session_openai_key
-                )
-
-                try:
-                    os.remove(image_path)
-                except:
-                    pass
-            else:
-                return jsonify({'error': 'Image file required for image-to-video'}), 400
+        # Text-to-video generation (no image)
+        if api_provider == 'replicate':
+            result = generate_video_with_replicate(
+                prompt=prompt,
+                duration=duration,
+                size=size,
+                output_path=video_path,
+                session_api_key=session_replicate_key
+            )
         else:
-            if api_provider == 'replicate':
-                result = generate_video_with_replicate(
-                    prompt=prompt,
-                    duration=duration,
-                    size=size,
-                    output_path=video_path,
-                    session_api_key=session_replicate_key
-                )
-            else:
-                result = generate_video_with_sora(
-                    prompt=prompt,
-                    duration=duration,
-                    size=size,
-                    output_path=video_path,
-                    session_api_key=session_openai_key
-                )
+            result = generate_video_with_sora(
+                prompt=prompt,
+                duration=duration,
+                size=size,
+                output_path=video_path,
+                session_api_key=session_openai_key
+            )
 
-        if result['success']:
+        if result.get('success'):
             session['last_video'] = video_filename
             return jsonify({
                 'success': True,
                 'video_url': f'/download_video/{video_filename}',
                 'video_id': result.get('video_id', ''),
-                'message': 'Sora video generated successfully!'
-            })
+                'message': f'{api_provider.capitalize()} video generated successfully!'
+            }), 200
         else:
-            return jsonify({'error': result['error']}), 500
+            error_msg = result.get('error', 'Unknown error occurred')
+            print(f"Video generation failed: {error_msg}")
+            return jsonify({'error': error_msg}), 400
 
     except Exception as e:
-        print(f"Error generating Sora video: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        print(f"Error generating video: {error_msg}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Server error: {error_msg}'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

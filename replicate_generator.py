@@ -18,9 +18,10 @@ def generate_video_with_replicate(prompt, duration=8, size="1280x720", output_pa
     """
     api_key = session_api_key or os.environ.get('REPLICATE_API_KEY')
     if not api_key:
+        print("ERROR: No Replicate API key found")
         return {
             'success': False,
-            'error': 'REPLICATE_API_KEY not found. Please add your Replicate API key in Secrets or provide it for the session.'
+            'error': 'REPLICATE_API_KEY not found. Please add your API key in Settings.'
         }
 
     try:
@@ -54,6 +55,7 @@ def generate_video_with_replicate(prompt, duration=8, size="1280x720", output_pa
             import urllib.request
             # Handle both URL string and FileOutput object
             video_url = str(output) if not isinstance(output, str) else output
+            print(f"Video URL: {video_url}")
             urllib.request.urlretrieve(video_url, output_path)
 
             print(f"Video saved to {output_path}")
@@ -63,6 +65,7 @@ def generate_video_with_replicate(prompt, duration=8, size="1280x720", output_pa
                 'video_path': output_path
             }
         else:
+            print("ERROR: No output received from Replicate")
             return {
                 'success': False,
                 'error': 'No output received from Replicate'
@@ -70,11 +73,14 @@ def generate_video_with_replicate(prompt, duration=8, size="1280x720", output_pa
 
     except Exception as e:
         error_message = str(e)
+        print(f"ERROR: Replicate API error: {error_message}")
+        import traceback
+        traceback.print_exc()
 
         if "invalid_api_key" in error_message.lower() or "authentication" in error_message.lower():
             return {
                 'success': False,
-                'error': 'Invalid Replicate API key. Get one free at replicate.com'
+                'error': 'Invalid Replicate API key. Get one at replicate.com and add it in Settings.'
             }
         elif "rate_limit" in error_message.lower():
             return {
