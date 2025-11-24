@@ -6,6 +6,7 @@ from datetime import datetime
 from templates import VIDEO_TEMPLATES, TEXT_PROMPTS
 from video_generator import generate_video
 from sora_generator import generate_video_with_sora, generate_video_with_image
+from replicate_generator import generate_video_with_replicate
 import json
 
 app = Flask(__name__)
@@ -164,7 +165,9 @@ def generate_sora_video_route():
             
         size = data.get('size', '1280x720')
         use_image = data.get('use_image', False)
+        api_provider = data.get('api_provider', 'sora')
         openai_api_key = data.get('openai_api_key', '')
+        replicate_api_key = data.get('replicate_api_key', '')
         
         if not prompt:
             return jsonify({'error': 'Prompt is required'}), 400
@@ -196,13 +199,22 @@ def generate_sora_video_route():
             else:
                 return jsonify({'error': 'Image file required for image-to-video'}), 400
         else:
-            result = generate_video_with_sora(
-                prompt=prompt,
-                duration=duration,
-                size=size,
-                output_path=video_path,
-                api_key=openai_api_key
-            )
+            if api_provider == 'replicate':
+                result = generate_video_with_replicate(
+                    prompt=prompt,
+                    duration=duration,
+                    size=size,
+                    output_path=video_path,
+                    api_key=replicate_api_key
+                )
+            else:
+                result = generate_video_with_sora(
+                    prompt=prompt,
+                    duration=duration,
+                    size=size,
+                    output_path=video_path,
+                    api_key=openai_api_key
+                )
         
         if result['success']:
             session['last_video'] = video_filename

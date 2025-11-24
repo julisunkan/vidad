@@ -33,6 +33,21 @@ if (soraDuration && durationValue) {
     });
 }
 
+// API provider selector
+const apiProvider = document.getElementById('apiProvider');
+const providerInfo = document.getElementById('providerInfo');
+if (apiProvider && providerInfo) {
+    apiProvider.addEventListener('change', function() {
+        if (this.value === 'sora') {
+            providerInfo.innerHTML = '<strong>⚠️ OpenAI Sora:</strong> Requires paid OpenAI API key with Sora access. Add OPENAI_API_KEY to Secrets. Cost: ~$0.10-$0.50 per second.';
+            providerInfo.className = 'alert alert-warning';
+        } else {
+            providerInfo.innerHTML = '<strong>💡 Replicate (Free tier available):</strong> Get API key at replicate.com. Free $5 credits to start. Cost: ~$0.006 per second of video.';
+            providerInfo.className = 'alert alert-info';
+        }
+    });
+}
+
 document.getElementById('templateSelect').addEventListener('change', function() {
     const templateId = this.value;
     
@@ -111,12 +126,15 @@ document.getElementById('videoForm').addEventListener('submit', function(e) {
     // Handle Sora generation
     if (generationMode === 'sora') {
         endpoint = '/generate_sora_video';
+        const apiProvider = document.getElementById('apiProvider').value;
         const soraData = {
             prompt: document.getElementById('soraPrompt').value,
             duration: parseInt(document.getElementById('soraDuration').value),
             size: document.getElementById('soraSize').value,
             use_image: false,
-            openai_api_key: settings.openai_api_key || ''
+            api_provider: apiProvider,
+            openai_api_key: settings.openai_api_key || '',
+            replicate_api_key: settings.replicate_api_key || ''
         };
         requestBody = JSON.stringify(soraData);
     }

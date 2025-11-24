@@ -1,4 +1,3 @@
-
 // Load saved settings on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
@@ -25,36 +24,39 @@ bgColorHex.addEventListener('input', function() {
 document.getElementById('showKeys').addEventListener('change', function() {
     const openaiKey = document.getElementById('openaiKey');
     const geminiKey = document.getElementById('geminiKey');
-    
+    const replicateKey = document.getElementById('replicateKey');
+
     if (this.checked) {
         openaiKey.type = 'text';
         geminiKey.type = 'text';
+        replicateKey.type = 'text';
     } else {
         openaiKey.type = 'password';
         geminiKey.type = 'password';
+        replicateKey.type = 'password';
     }
 });
 
 // Save settings
 document.getElementById('settingsForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const settings = {
         openai_api_key: document.getElementById('openaiKey').value,
-        gemini_api_key: document.getElementById('geminiKey').value,
+        replicate_api_key: document.getElementById('replicateKey').value,
         background_color: document.getElementById('bgColor').value
     };
-    
+
     // Save to localStorage
     localStorage.setItem('videoGenSettings', JSON.stringify(settings));
-    
+
     // Show success message
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
-    
+
     successMessage.classList.remove('d-none');
     errorMessage.classList.add('d-none');
-    
+
     // Hide success message after 3 seconds
     setTimeout(() => {
         successMessage.classList.add('d-none');
@@ -64,19 +66,16 @@ document.getElementById('settingsForm').addEventListener('submit', function(e) {
 // Load settings from localStorage
 function loadSettings() {
     const savedSettings = localStorage.getItem('videoGenSettings');
-    
+
     if (savedSettings) {
         try {
             const settings = JSON.parse(savedSettings);
-            
             if (settings.openai_api_key) {
                 document.getElementById('openaiKey').value = settings.openai_api_key;
             }
-            
-            if (settings.gemini_api_key) {
-                document.getElementById('geminiKey').value = settings.gemini_api_key;
+            if (settings.replicate_api_key) {
+                document.getElementById('replicateKey').value = settings.replicate_api_key;
             }
-            
             if (settings.background_color) {
                 document.getElementById('bgColor').value = settings.background_color;
                 document.getElementById('bgColorHex').value = settings.background_color;

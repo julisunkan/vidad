@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,12 +21,12 @@
                 <div class="card shadow-lg">
                     <div class="card-body p-4">
                         <h2 class="card-title mb-4">⚙️ Settings</h2>
-                        
+
                         <form id="settingsForm">
                             <!-- API Keys Section -->
                             <div class="mb-5">
                                 <h5 class="mb-3">🔑 API Keys</h5>
-                                
+
                                 <div class="mb-4">
                                     <label for="openaiKey" class="form-label fw-bold">OpenAI API Key (Sora)</label>
                                     <input type="password" class="form-control" id="openaiKey" name="openai_api_key" 
@@ -48,6 +47,17 @@
                                     </small>
                                 </div>
 
+                                <div class="mb-4">
+                                    <label for="replicateKey" class="form-label fw-bold">Replicate API Key</label>
+                                    <input type="password" class="form-control" id="replicateKey" name="replicate_api_key" 
+                                           placeholder="r8_...">
+                                    <small class="form-text text-muted">
+                                        For budget AI generation (e.g., Stable Video Diffusion). Get your key at 
+                                        <a href="https://replicate.com/account/api-tokens" target="_blank">replicate.com</a>. 
+                                        Offers a free tier with limited credits (~$0.006/sec).
+                                    </small>
+                                </div>
+
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="showKeys">
                                     <label class="form-check-label" for="showKeys">
@@ -59,7 +69,7 @@
                             <!-- Video Settings Section -->
                             <div class="mb-5">
                                 <h5 class="mb-3">🎨 Video Settings</h5>
-                                
+
                                 <div class="mb-4">
                                     <label for="bgColor" class="form-label fw-bold">Default Background Color</label>
                                     <div class="input-group">
@@ -102,6 +112,7 @@
                         <ul class="mb-0">
                             <li><strong>OpenAI Sora:</strong> Required for AI-powered video generation. Cost: ~$0.10-$0.50 per second of video.</li>
                             <li><strong>Gemini:</strong> Optional for enhanced content suggestions and improvements.</li>
+                            <li><strong>Replicate (Stable Video Diffusion):</strong> An affordable alternative for AI video generation. Offers a free tier with limited credits. Cost: ~$0.006 per second of video.</li>
                             <li><strong>Security:</strong> Your API keys are stored securely in your browser's local storage and are never sent to our servers except when making API calls.</li>
                         </ul>
                     </div>

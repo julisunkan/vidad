@@ -101,9 +101,17 @@
                             
                             <!-- Sora AI Fields -->
                             <div id="soraFields" style="display: none;">
-                                <div class="alert alert-warning">
-                                    <strong>⚠️ Note:</strong> Sora API requires an OpenAI API key with Sora access. 
-                                    Add your OPENAI_API_KEY to Secrets. Cost: ~$0.10-$0.50 per second of video.
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">AI Provider</label>
+                                    <select class="form-select" id="apiProvider">
+                                        <option value="sora">OpenAI Sora (High quality, ~$0.10-0.50/sec)</option>
+                                        <option value="replicate" selected>Replicate SVD (Budget, ~$0.006/sec)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="alert alert-info" id="providerInfo">
+                                    <strong>💡 Replicate (Free tier available):</strong> Get API key at replicate.com. 
+                                    Free $5 credits to start. Cost: ~$0.006 per second of video.
                                 </div>
                                 
                                 <div class="mb-4">
