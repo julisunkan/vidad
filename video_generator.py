@@ -1,4 +1,6 @@
+
 from moviepy import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip, ColorClip, concatenate_audioclips
+from moviepy.video.fx import fadein, fadeout
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
@@ -41,15 +43,15 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
                 if i < len(effects):
                     effect = effects[i % len(effects)]
                     if effect == 'disintegrate' and i == 0:
-                        img_clip = apply_fade_out(img_clip, 1)
+                        img_clip = img_clip.fx(fadeout, 1)
                     elif effect == 'reintegrate':
-                        img_clip = apply_fade_in(img_clip, 1)
+                        img_clip = img_clip.fx(fadein, 1)
                     else:
-                        img_clip = apply_fade_in(img_clip, 0.5)
-                        img_clip = apply_fade_out(img_clip, 0.5)
+                        img_clip = img_clip.fx(fadein, 0.5)
+                        img_clip = img_clip.fx(fadeout, 0.5)
                 else:
-                    img_clip = apply_fade_in(img_clip, 0.5)
-                    img_clip = apply_fade_out(img_clip, 0.5)
+                    img_clip = img_clip.fx(fadein, 0.5)
+                    img_clip = img_clip.fx(fadeout, 0.5)
                 
                 clips.append(img_clip)
             except Exception as e:
@@ -78,8 +80,8 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
             )
             
             text_clip = text_clip.with_position('center').with_start(start)
-            text_clip = apply_fade_in(text_clip, 0.3)
-            text_clip = apply_fade_out(text_clip, 0.3)
+            text_clip = text_clip.fx(fadein, 0.3)
+            text_clip = text_clip.fx(fadeout, 0.3)
             
             clips.append(text_clip)
         except Exception as e:
@@ -94,10 +96,10 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
             try:
                 audio = AudioFileClip(audio_file)
                 if audio.duration > duration:
-                    audio = audio.subclip(0, duration)
+                    audio = audio.subclipped(0, duration)
                 elif audio.duration < duration:
                     loops = int(duration / audio.duration) + 1
-                    audio = concatenate_audioclips([audio] * loops).subclip(0, duration)
+                    audio = concatenate_audioclips([audio] * loops).subclipped(0, duration)
                 
                 final_video = final_video.with_audio(audio)
             except Exception as e:
@@ -131,4 +133,3 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
     except Exception as e:
         print(f"Error generating final video: {e}")
         raise
-
