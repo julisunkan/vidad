@@ -46,15 +46,25 @@ def save_settings():
         if not data:
             return jsonify({'error': 'Invalid request'}), 400
 
-        # Store API keys in session
-        if data.get('openai_api_key'):
-            session['openai_api_key'] = data['openai_api_key']
-        if data.get('replicate_api_key'):
-            session['replicate_api_key'] = data['replicate_api_key']
+        # Store API keys in session (or clear them if empty)
+        openai_key = data.get('openai_api_key', '').strip()
+        replicate_key = data.get('replicate_api_key', '').strip()
         
-        # Background color doesn't need to be in session
-        return jsonify({'success': True})
+        if openai_key:
+            session['openai_api_key'] = openai_key
+        elif 'openai_api_key' in session:
+            session.pop('openai_api_key')
+            
+        if replicate_key:
+            session['replicate_api_key'] = replicate_key
+        elif 'replicate_api_key' in session:
+            session.pop('replicate_api_key')
+        
+        session.modified = True
+        
+        return jsonify({'success': True}), 200
     except Exception as e:
+        print(f"Error saving settings: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/get_settings')
@@ -64,8 +74,9 @@ def get_settings():
         return jsonify({
             'openai_api_key': session.get('openai_api_key', ''),
             'replicate_api_key': session.get('replicate_api_key', '')
-        })
+        }), 200
     except Exception as e:
+        print(f"Error getting settings: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/static/manifest.json')

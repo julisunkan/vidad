@@ -51,7 +51,14 @@ document.getElementById('settingsForm').addEventListener('submit', function(e) {
         },
         body: JSON.stringify(settings)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.error || `HTTP error! status: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Save only non-sensitive settings to localStorage
@@ -75,6 +82,7 @@ document.getElementById('settingsForm').addEventListener('submit', function(e) {
         }
     })
     .catch(error => {
+        console.error('Settings save error:', error);
         const errorMessage = document.getElementById('errorMessage');
         const errorText = document.getElementById('errorText');
         errorText.textContent = error.message;
