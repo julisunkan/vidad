@@ -1,0 +1,89 @@
+
+// Load saved settings on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadSettings();
+});
+
+// Color picker synchronization
+const bgColor = document.getElementById('bgColor');
+const bgColorHex = document.getElementById('bgColorHex');
+const colorPreview = document.getElementById('colorPreview');
+
+bgColor.addEventListener('input', function() {
+    bgColorHex.value = this.value;
+    colorPreview.style.backgroundColor = this.value;
+});
+
+bgColorHex.addEventListener('input', function() {
+    if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+        bgColor.value = this.value;
+        colorPreview.style.backgroundColor = this.value;
+    }
+});
+
+// Show/hide API keys
+document.getElementById('showKeys').addEventListener('change', function() {
+    const openaiKey = document.getElementById('openaiKey');
+    const geminiKey = document.getElementById('geminiKey');
+    
+    if (this.checked) {
+        openaiKey.type = 'text';
+        geminiKey.type = 'text';
+    } else {
+        openaiKey.type = 'password';
+        geminiKey.type = 'password';
+    }
+});
+
+// Save settings
+document.getElementById('settingsForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const settings = {
+        openai_api_key: document.getElementById('openaiKey').value,
+        gemini_api_key: document.getElementById('geminiKey').value,
+        background_color: document.getElementById('bgColor').value
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('videoGenSettings', JSON.stringify(settings));
+    
+    // Show success message
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    
+    successMessage.classList.remove('d-none');
+    errorMessage.classList.add('d-none');
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+        successMessage.classList.add('d-none');
+    }, 3000);
+});
+
+// Load settings from localStorage
+function loadSettings() {
+    const savedSettings = localStorage.getItem('videoGenSettings');
+    
+    if (savedSettings) {
+        try {
+            const settings = JSON.parse(savedSettings);
+            
+            if (settings.openai_api_key) {
+                document.getElementById('openaiKey').value = settings.openai_api_key;
+            }
+            
+            if (settings.gemini_api_key) {
+                document.getElementById('geminiKey').value = settings.gemini_api_key;
+            }
+            
+            if (settings.background_color) {
+                document.getElementById('bgColor').value = settings.background_color;
+                document.getElementById('bgColorHex').value = settings.background_color;
+                document.getElementById('colorPreview').style.backgroundColor = settings.background_color;
+            }
+        } catch (e) {
+            console.error('Error loading settings:', e);
+        }
+    }
+}

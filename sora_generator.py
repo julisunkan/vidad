@@ -5,7 +5,7 @@ from openai import OpenAI
 # Using blueprint:python_openai integration for OpenAI API access
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-def generate_video_with_sora(prompt, duration=8, size="1280x720", output_path="output.mp4"):
+def generate_video_with_sora(prompt, duration=8, size="1280x720", output_path="output.mp4", api_key=None):
     """
     Generate a video using OpenAI's Sora API
     
@@ -14,18 +14,20 @@ def generate_video_with_sora(prompt, duration=8, size="1280x720", output_path="o
         duration (int): Video duration in seconds (4-20)
         size (str): Video resolution ("720x1280", "1280x720", "1080x1920")
         output_path (str): Path to save the generated video
+        api_key (str): OpenAI API key (optional, uses environment variable if not provided)
     
     Returns:
         dict: Result with status and video path or error message
     """
-    if not OPENAI_API_KEY:
+    api_key_to_use = api_key or OPENAI_API_KEY
+    if not api_key_to_use:
         return {
             'success': False,
             'error': 'OPENAI_API_KEY not found. Please add your OpenAI API key in Secrets.'
         }
     
     try:
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=api_key_to_use)
         
         print(f"Creating Sora video generation job...")
         print(f"Prompt: {prompt}")

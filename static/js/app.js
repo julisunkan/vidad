@@ -87,7 +87,24 @@ document.getElementById('videoForm').addEventListener('submit', function(e) {
         }
     }
     
+    // Load settings from localStorage
+    const savedSettings = localStorage.getItem('videoGenSettings');
+    let settings = {};
+    if (savedSettings) {
+        try {
+            settings = JSON.parse(savedSettings);
+        } catch (e) {
+            console.error('Error loading settings:', e);
+        }
+    }
+    
     const formData = new FormData(this);
+    
+    // Add background color from settings if available
+    if (settings.background_color && generationMode === 'template') {
+        formData.append('background_color', settings.background_color);
+    }
+    
     let endpoint = '/generate_video';
     let requestBody = formData;
     
@@ -98,7 +115,8 @@ document.getElementById('videoForm').addEventListener('submit', function(e) {
             prompt: document.getElementById('soraPrompt').value,
             duration: parseInt(document.getElementById('soraDuration').value),
             size: document.getElementById('soraSize').value,
-            use_image: false
+            use_image: false,
+            openai_api_key: settings.openai_api_key || ''
         };
         requestBody = JSON.stringify(soraData);
     }

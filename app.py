@@ -33,6 +33,10 @@ def index():
                          templates=VIDEO_TEMPLATES, 
                          prompts=TEXT_PROMPTS)
 
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
 @app.route('/get_template/<int:template_id>')
 def get_template(template_id):
     template = next((t for t in VIDEO_TEMPLATES if t['id'] == template_id), None)
@@ -51,6 +55,11 @@ def generate_video_route():
         selected_prompt = request.form.get('text_prompt', '')
         custom_text = request.form.get('custom_text', '')
         gemini_api_key = request.form.get('gemini_api_key', '')
+        background_color = request.form.get('background_color', '#1e3c72')
+        
+        # Convert hex color to RGB tuple
+        bg_color_hex = background_color.lstrip('#')
+        bg_color_rgb = tuple(int(bg_color_hex[i:i+2], 16) for i in (0, 2, 4))
         
         template = next((t for t in VIDEO_TEMPLATES if t['id'] == template_id), None)
         if not template:
@@ -103,7 +112,8 @@ def generate_video_route():
             images=uploaded_images,
             text_overlays=text_overlays,
             audio_file=audio_file,
-            output_path=video_path
+            output_path=video_path,
+            background_color=bg_color_rgb
         )
         
         session['last_video'] = video_filename
@@ -154,6 +164,7 @@ def generate_sora_video_route():
             
         size = data.get('size', '1280x720')
         use_image = data.get('use_image', False)
+        openai_api_key = data.get('openai_api_key', '')
         
         if not prompt:
             return jsonify({'error': 'Prompt is required'}), 400
@@ -189,7 +200,8 @@ def generate_sora_video_route():
                 prompt=prompt,
                 duration=duration,
                 size=size,
-                output_path=video_path
+                output_path=video_path,
+                api_key=openai_api_key
             )
         
         if result['success']:
