@@ -42,16 +42,6 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="geminiKey" class="form-label fw-bold">Gemini API Key</label>
-                                    <input type="password" class="form-control" id="geminiKey" name="gemini_api_key" 
-                                           placeholder="AIza...">
-                                    <small class="form-text text-muted">
-                                        Optional for AI content enhancements. Get your key at 
-                                        <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
-                                    </small>
-                                </div>
-
-                                <div class="mb-4">
                                     <label for="replicateKey" class="form-label fw-bold">Replicate API Key</label>
                                     <input type="password" class="form-control" id="replicateKey" name="replicate_api_key" 
                                            placeholder="r8_...">
@@ -115,7 +105,6 @@
                         <h5 class="card-title">ℹ️ About API Keys</h5>
                         <ul class="mb-0">
                             <li><strong>OpenAI Sora:</strong> Required for AI-powered video generation. Cost: ~$0.10-$0.50 per second of video.</li>
-                            <li><strong>Gemini:</strong> Optional for enhanced content suggestions and improvements.</li>
                             <li><strong>Replicate (Stable Video Diffusion):</strong> An affordable alternative for AI video generation. Offers a free tier with limited credits. Cost: ~$0.006 per second of video.</li>
                             <li><strong>Security:</strong> Your API keys are stored securely in your browser's local storage and are never sent to our servers except when making API calls.</li>
                         </ul>
@@ -143,6 +132,19 @@
     <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
     <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
     <script>
+        // Show/hide API keys
+        document.getElementById('showKeys').addEventListener('change', function() {
+            const openaiKey = document.getElementById('openaiKey');
+            const replicateKey = document.getElementById('replicateKey');
+
+            if (this.checked) {
+                openaiKey.type = 'text';
+                replicateKey.type = 'text';
+            } else {
+                openaiKey.type = 'password';
+                replicateKey.type = 'password';
+            }
+        });
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/sw.js')
                 .then(reg => console.log('Service Worker registered'))

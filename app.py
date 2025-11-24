@@ -63,7 +63,6 @@ def generate_video_route():
         template_id = int(template_id_str)
         selected_prompt = request.form.get('text_prompt', '')
         custom_text = request.form.get('custom_text', '')
-        gemini_api_key = request.form.get('gemini_api_key', '')
         background_color = request.form.get('background_color', '#1e3c72')
         
         # Convert hex color to RGB tuple
