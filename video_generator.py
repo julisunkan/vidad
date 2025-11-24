@@ -75,6 +75,7 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
         final_video = CompositeVideoClip(clips, size=video_size)
         final_video = final_video.with_duration(duration)
         
+        audio = None
         if audio_file and os.path.exists(audio_file):
             try:
                 audio = AudioFileClip(audio_file)
@@ -100,7 +101,7 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
         
         for clip in clips:
             clip.close()
-        if audio_file and os.path.exists(audio_file):
+        if audio is not None:
             try:
                 audio.close()
             except:

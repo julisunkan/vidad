@@ -8,7 +8,7 @@ from video_generator import generate_video
 import json
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SESSION_SECRET', 'dev-secret-key-change-in-production')
+app.secret_key = os.environ.get("SESSION_SECRET")
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 app.config['ALLOWED_IMAGE_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -42,7 +42,11 @@ def get_template(template_id):
 @app.route('/generate_video', methods=['POST'])
 def generate_video_route():
     try:
-        template_id = int(request.form.get('template_id'))
+        template_id_str = request.form.get('template_id')
+        if not template_id_str:
+            return jsonify({'error': 'Template ID is required'}), 400
+        
+        template_id = int(template_id_str)
         selected_prompt = request.form.get('text_prompt', '')
         custom_text = request.form.get('custom_text', '')
         gemini_api_key = request.form.get('gemini_api_key', '')
