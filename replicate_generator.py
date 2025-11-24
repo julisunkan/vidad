@@ -55,7 +55,9 @@ def generate_video_with_replicate(prompt, duration=4, size="1280x720", output_pa
         if output:
             print("Downloading generated video...")
             import urllib.request
-            urllib.request.urlretrieve(output, output_path)
+            # Handle both URL string and FileOutput object
+            video_url = str(output) if not isinstance(output, str) else output
+            urllib.request.urlretrieve(video_url, output_path)
             
             print(f"Video saved to {output_path}")
             
@@ -134,7 +136,9 @@ def generate_video_with_replicate_img2vid(prompt, image_path, duration=4, output
         
         if output:
             import urllib.request
-            urllib.request.urlretrieve(output, output_path)
+            # Handle both URL string and FileOutput object
+            video_url = str(output) if not isinstance(output, str) else output
+            urllib.request.urlretrieve(video_url, output_path)
             
             return {
                 'success': True,
