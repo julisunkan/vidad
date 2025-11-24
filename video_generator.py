@@ -1,4 +1,4 @@
-from moviepy import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip, ColorClip
+from moviepy import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip, ColorClip, concatenate_audioclips
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
@@ -131,15 +131,3 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
         print(f"Error generating final video: {e}")
         raise
 
-def concatenate_audioclips(clips):
-    from moviepy.audio.AudioClip import CompositeAudioClip
-    if not clips:
-        return None
-    
-    current_time = 0
-    positioned_clips = []
-    for clip in clips:
-        positioned_clips.append(clip.set_start(current_time))
-        current_time += clip.duration
-    
-    return CompositeAudioClip(positioned_clips)

@@ -52,33 +52,13 @@ def apply_slide_effect(clip, direction='right'):
 
 def apply_disintegrate_effect(image_path, duration=3, size=(1280, 720)):
     clip = ImageClip(image_path, duration=duration).resize(size)
-    
-    def disintegrate(t):
-        progress = t / duration
-        opacity = 1 - progress
-        scale = 1 - (progress * 0.5)
-        rotation = progress * 45
-        
-        frame = clip.get_frame(0)
-        rotated = clip.resize(scale).rotate(rotation).set_opacity(opacity)
-        return rotated.get_frame(t)
-    
-    return clip.fl(lambda gf, t: disintegrate(t), apply_to=[])
+    clip = clip.fadeout(duration * 0.8)
+    return clip
 
 def apply_reintegrate_effect(image_path, duration=3, size=(1280, 720)):
     clip = ImageClip(image_path, duration=duration).resize(size)
-    
-    def reintegrate(t):
-        progress = t / duration
-        opacity = progress
-        scale = 0.5 + (progress * 0.5)
-        rotation = (1 - progress) * 45
-        
-        frame = clip.get_frame(0)
-        transformed = clip.resize(scale).rotate(rotation).set_opacity(opacity)
-        return transformed.get_frame(t)
-    
-    return clip.fl(lambda gf, t: reintegrate(t), apply_to=[])
+    clip = clip.fadein(duration * 0.8)
+    return clip
 
 def create_background_clip(duration, size=(1280, 720), color=(30, 60, 114)):
     img = Image.new('RGB', size, color=color)
