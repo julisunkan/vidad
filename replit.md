@@ -80,6 +80,11 @@ A web application that allows users to generate professional video advertisement
 
 ## Recent Changes
 - **2024-11-24**: 
+  - **Security Fix**: Removed insecure localStorage API key storage, now using Replit Secrets exclusively
+  - **Runtime Environment Variables**: API keys are now read from environment at runtime instead of module import time
+  - **Updated Settings Page**: Settings now guide users to add API keys via Replit Secrets tab
+  - **Enhanced Documentation**: Created API_KEYS_SETUP.md with step-by-step security setup guide
+  - **Backend Security**: Modified app.py, sora_generator.py, and replicate_generator.py to only use environment variables
   - **Added OpenAI Sora Integration**: Implemented dual-mode UI for template-based and AI-powered video generation
   - **Created sora_generator.py**: Sora API module with polling, status tracking, and error handling
   - **Updated UI**: Added mode selector to switch between template and Sora generation modes
