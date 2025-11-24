@@ -1,4 +1,37 @@
 let currentTemplate = null;
+let generationMode = 'template';
+
+// Mode switching
+document.querySelectorAll('input[name="generationMode"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        generationMode = this.value;
+        const templateFields = document.getElementById('templateFields');
+        const soraFields = document.getElementById('soraFields');
+        const modeDescription = document.getElementById('modeDescription');
+        const templateSelect = document.getElementById('templateSelect');
+        
+        if (generationMode === 'sora') {
+            templateFields.style.display = 'none';
+            soraFields.style.display = 'block';
+            modeDescription.textContent = 'Use OpenAI Sora AI to generate videos from text descriptions';
+            templateSelect.removeAttribute('required');
+        } else {
+            templateFields.style.display = 'block';
+            soraFields.style.display = 'none';
+            modeDescription.textContent = 'Use pre-built templates with images and text overlays';
+            templateSelect.setAttribute('required', 'required');
+        }
+    });
+});
+
+// Sora duration slider
+const soraDuration = document.getElementById('soraDuration');
+const durationValue = document.getElementById('durationValue');
+if (soraDuration && durationValue) {
+    soraDuration.addEventListener('input', function() {
+        durationValue.textContent = this.value;
+    });
+}
 
 document.getElementById('templateSelect').addEventListener('change', function() {
     const templateId = this.value;
@@ -41,24 +74,55 @@ document.getElementById('templateSelect').addEventListener('change', function() 
 document.getElementById('videoForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    if (!currentTemplate) {
+    if (generationMode === 'template' && !currentTemplate) {
         alert('Please select a video template');
         return;
     }
     
+    if (generationMode === 'sora') {
+        const prompt = document.getElementById('soraPrompt').value.trim();
+        if (!prompt) {
+            alert('Please enter a video description');
+            return;
+        }
+    }
+    
     const formData = new FormData(this);
+    let endpoint = '/generate_video';
+    let requestBody = formData;
+    
+    // Handle Sora generation
+    if (generationMode === 'sora') {
+        endpoint = '/generate_sora_video';
+        const soraData = {
+            prompt: document.getElementById('soraPrompt').value,
+            duration: parseInt(document.getElementById('soraDuration').value),
+            size: document.getElementById('soraSize').value,
+            use_image: false
+        };
+        requestBody = JSON.stringify(soraData);
+    }
     
     document.getElementById('generateBtn').disabled = true;
     document.getElementById('btnText').classList.add('d-none');
     document.getElementById('btnSpinner').classList.remove('d-none');
     document.getElementById('progressSection').classList.remove('d-none');
     document.getElementById('resultSection').classList.add('d-none');
-    document.getElementById('errorSection').classList.add('d-none');
+    const errorSection = document.getElementById('errorSection');
+    if (errorSection) errorSection.classList.add('d-none');
     
-    fetch('/generate_video', {
+    const fetchOptions = {
         method: 'POST',
-        body: formData
-    })
+        body: requestBody
+    };
+    
+    if (generationMode === 'sora') {
+        fetchOptions.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+    
+    fetch(endpoint, fetchOptions)
     .then(response => response.json())
     .then(data => {
         document.getElementById('generateBtn').disabled = false;

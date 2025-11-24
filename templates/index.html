@@ -21,10 +21,31 @@
                     <div class="card-body p-4">
                         <h2 class="card-title mb-4">Create Your Video Ad</h2>
                         
+                        <!-- Mode Selector -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Generation Mode</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="generationMode" id="templateMode" value="template" checked>
+                                <label class="btn btn-outline-primary" for="templateMode">
+                                    📝 Template-Based
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="generationMode" id="soraMode" value="sora">
+                                <label class="btn btn-outline-primary" for="soraMode">
+                                    🤖 Sora AI Generation
+                                </label>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                <span id="modeDescription">Use pre-built templates with images and text overlays</span>
+                            </small>
+                        </div>
+                        
                         <form id="videoForm" enctype="multipart/form-data">
+                            <!-- Template-Based Fields -->
+                            <div id="templateFields">
                             <div class="mb-4">
                                 <label for="templateSelect" class="form-label fw-bold">Select Video Template</label>
-                                <select class="form-select" id="templateSelect" name="template_id" required>
+                                <select class="form-select" id="templateSelect" name="template_id">
                                     <option value="">Choose a template...</option>
                                     {% for template in templates %}
                                     <option value="{{ template.id }}">{{ template.name }} - {{ template.description }}</option>
@@ -74,6 +95,45 @@
                                        accept=".mp3,.wav,.ogg,.m4a">
                                 <small class="form-text text-muted">Supported formats: MP3, WAV, OGG, M4A</small>
                             </div>
+                            </div>
+                            <!-- End Template Fields -->
+                            
+                            <!-- Sora AI Fields -->
+                            <div id="soraFields" style="display: none;">
+                                <div class="alert alert-warning">
+                                    <strong>⚠️ Note:</strong> Sora API requires an OpenAI API key with Sora access. 
+                                    Add your OPENAI_API_KEY to Secrets. Cost: ~$0.10-$0.50 per second of video.
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="soraPrompt" class="form-label fw-bold">Video Description</label>
+                                    <textarea class="form-control" id="soraPrompt" rows="4" 
+                                              placeholder="Describe the video you want to generate... e.g., 'A cinematic shot of a modern smartphone rotating slowly on a white background with dramatic lighting'"></textarea>
+                                    <small class="form-text text-muted">
+                                        Be specific about camera angles, lighting, style, and movement for best results.
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="soraDuration" class="form-label fw-bold">Duration (seconds)</label>
+                                    <input type="range" class="form-range" id="soraDuration" min="4" max="20" value="8" step="1">
+                                    <div class="d-flex justify-content-between">
+                                        <small>4s</small>
+                                        <small><strong id="durationValue">8</strong> seconds</small>
+                                        <small>20s</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="soraSize" class="form-label fw-bold">Video Size</label>
+                                    <select class="form-select" id="soraSize">
+                                        <option value="1280x720">1280x720 (16:9 Landscape)</option>
+                                        <option value="720x1280">720x1280 (9:16 Portrait)</option>
+                                        <option value="1080x1920">1080x1920 (9:16 Full HD Portrait)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- End Sora Fields -->
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">

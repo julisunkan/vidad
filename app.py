@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from templates import VIDEO_TEMPLATES, TEXT_PROMPTS
 from video_generator import generate_video
+from sora_generator import generate_video_with_sora, generate_video_with_image
 import json
 
 app = Flask(__name__)
@@ -136,6 +137,68 @@ def preview_video(filename):
         return "Video not found", 404
     except Exception as e:
         return str(e), 500
+
+@app.route('/generate_sora_video', methods=['POST'])
+def generate_sora_video_route():
+    """Generate video using OpenAI Sora API"""
+    try:
+        data = request.get_json()
+        prompt = data.get('prompt', '')
+        duration = int(data.get('duration', 8))
+        size = data.get('size', '1280x720')
+        use_image = data.get('use_image', False)
+        
+        if not prompt:
+            return jsonify({'error': 'Prompt is required'}), 400
+        
+        duration = max(4, min(20, duration))
+        
+        video_filename = f"sora_{uuid.uuid4()}.mp4"
+        video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
+        
+        if use_image and 'image' in request.files:
+            image_file = request.files['image']
+            if image_file and image_file.filename:
+                image_filename = secure_filename(f"{uuid.uuid4()}_{image_file.filename}")
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+                image_file.save(image_path)
+                
+                result = generate_video_with_image(
+                    prompt=prompt,
+                    image_path=image_path,
+                    duration=duration,
+                    size=size,
+                    output_path=video_path
+                )
+                
+                try:
+                    os.remove(image_path)
+                except:
+                    pass
+            else:
+                return jsonify({'error': 'Image file required for image-to-video'}), 400
+        else:
+            result = generate_video_with_sora(
+                prompt=prompt,
+                duration=duration,
+                size=size,
+                output_path=video_path
+            )
+        
+        if result['success']:
+            session['last_video'] = video_filename
+            return jsonify({
+                'success': True,
+                'video_url': f'/download_video/{video_filename}',
+                'video_id': result.get('video_id', ''),
+                'message': 'Sora video generated successfully!'
+            })
+        else:
+            return jsonify({'error': result['error']}), 500
+    
+    except Exception as e:
+        print(f"Error generating Sora video: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
