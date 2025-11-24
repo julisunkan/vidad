@@ -1,0 +1,167 @@
+Project Prompt: AI Video Ads Generator with Gemini API, Pre-Built Templates, Pre-Written Text Prompts, and Image Disintegration/Reintegration Effects
+Objective:
+Build a web app that allows users to:
+1.	Use their Gemini API key to generate AI-based video ads from selected pre-built video templates and pre-written text prompts.
+2.	Customize videos with text overlays, transitions, background music, and image disintegration/reintegration effects.
+3.	Apply creative image disintegration effects (where images break apart) and reintegration effects (where the image reassembles).
+4.	Allow users to download the generated video.
+________________________________________
+Step-by-Step Instructions to Build the Web App
+________________________________________
+1. Set Up the Project Environment
+1.	Create a New Replit Project:
+o	Go to Replit and create a new project using the Flask template.
+o	Name your project: AI-Video-Ads-Generator.
+o	Choose Python as the language.
+________________________________________
+2. Install Required Dependencies
+In the Replit Shell (terminal), run the following commands to install the necessary Python packages:
+# Install Flask for the web framework
+pip install flask
+
+# Install requests for making API calls to Gemini
+pip install requests
+
+# Install MoviePy for video editing and special effects (disintegration/reintegration effects)
+pip install moviepy
+
+# Install pyttsx3 for Text-to-Speech (TTS) (optional for voiceover)
+pip install pyttsx3
+
+# Install gTTS for Google Text-to-Speech (optional for voiceover)
+pip install gTTS
+
+# Install spaCy for NLP (optional, if processing text prompts)
+pip install spacy
+
+# Download spaCy language model
+python -m spacy download en_core_web_sm
+________________________________________
+3. Folder Structure
+Create the following project structure in Replit:
+/AI-Video-Ads-Generator
+    /static
+        /css
+        /js
+    /uploads
+    /templates
+    /database
+    app.py
+•	/static: Store your CSS and JavaScript files.
+•	/uploads: Store uploaded files like images, audio, and generated video files.
+•	/templates: Store your HTML templates.
+•	/database: Store SQLite database (e.g., db.sqlite) for project/session data.
+•	app.py: Main backend logic (Flask app).
+________________________________________
+4. Pre-Built Video Templates
+Create 10 pre-built, editable video templates that users can choose from. These templates can be basic video structures with placeholders for images, text, transitions, and music. The templates will also allow for the addition of image disintegration and reintegration effects.
+Example Template Breakdown:
+1.	Template 1: Corporate Introduction
+o	Transitions: Fade-in, Slide-out
+o	Text: "Welcome to [Business Name]", "Innovative Solutions for You"
+o	Music: Upbeat corporate theme
+o	Image slots: Company logo, Office environment
+o	Special Effect: Disintegration effect on logo.
+2.	Template 2: Product Launch
+o	Transitions: Zoom-in, Swipe
+o	Text: "Introducing the [Product Name]", "Get Yours Today!"
+o	Music: Exciting, energetic tune
+o	Image slots: Product images, Lifestyle shots
+o	Special Effect: Reintegration effect for product images.
+3.	Template 3: Testimonial Video
+o	Transitions: Crossfade
+o	Text: "What Our Customers Are Saying"
+o	Music: Soft, inspirational background
+o	Image slots: Customer testimonial photos, Product usage
+o	Special Effect: Disintegration and reintegration effects for customer photos.
+(You can create 10 such templates with various themes like promotions, events, services, etc., and add effects as needed.)
+________________________________________
+5. Pre-Written Text Prompts
+Offer users 50 pre-written text prompts to help them quickly generate a video ad without needing to come up with their own text. The prompts should cover a wide range of business types, events, and occasions.
+Example Prompts:
+1.	"Generate a promotional video for my [product/service]."
+2.	"Create an ad to introduce our new collection of [clothing/accessories]."
+3.	"Make an exciting ad for the launch of our [mobile app]."
+4.	"Generate a video ad for our [fitness program/online course]."
+5.	"Create a testimonial video to showcase our customers' success stories."
+6.	"Generate a video to promote our upcoming [sale/discount]."
+7.	"Make a product demo ad for our [electronics product]."
+8.	"Create an event announcement video for our [conference/seminar]."
+9.	"Generate a video ad for our [restaurant/cafe] to showcase our new menu."
+10.	"Create a holiday promotion video for our [fashion brand]."
+(Include 50 such prompts that cover a variety of industries, products, and services.)
+________________________________________
+6. Backend Logic (app.py)
+1.	Set Up Flask Routes:
+o	Home Route (/): Display the form where users can choose a video template, select a text prompt, upload images, input their Gemini API key, and configure settings (e.g., transitions, background music).
+o	Generate Video Route (/generate_video_from_prompt): Handle the form submission, call Gemini API to generate the video using the selected template and text prompt, and allow the user to customize the video (e.g., add images, music, apply disintegration/reintegration effects).
+o	Download Route (/download_video): Allow users to download the generated video.
+2.	Gemini API Integration:
+o	The user will provide their Gemini API key.
+o	Select a pre-built video template and a text prompt.
+o	Upload images and music (optional).
+o	The app sends these inputs to the Gemini API to generate the video and return the generated video URL.
+3.	Image Disintegration/Reintegration Effects:
+o	The user can opt to apply image disintegration (where the image breaks apart) and reintegration (where the pieces of the image come back together) effects to specific images in the video.
+MoviePy Logic for Disintegration/Reintegration Effects:
+from moviepy.editor import ImageClip, concatenate_videoclips
+import numpy as np
+
+def disintegrate_image(image_path, duration=3):
+    # Load the image
+    clip = ImageClip(image_path, duration=duration)
+
+    # Apply disintegration effect (breaking the image into fragments)
+    # Example: Split the image into pieces and animate them falling or dispersing
+    # Here, you would create your disintegration animation logic
+    # This is a simplified placeholder effect
+    disintegration_effect = clip.fx(lambda clip: clip.resize(0.5).rotate(45))  # Example effect
+
+    return disintegration_effect
+
+def reintegrate_image(image_path, duration=3):
+    # Load the image
+    clip = ImageClip(image_path, duration=duration)
+
+    # Apply reintegration effect (image coming together)
+    # You can use similar logic to reverse the disintegration process
+    reintegration_effect = clip.fx(lambda clip: clip.resize(1.0))  # Example effect
+
+    return reintegration_effect
+________________________________________
+7. Provide Video Download Link
+Once the video is generated, provide the user with a download link for the video:
+1.	If using Gemini API, the generated video URL will be returned.
+2.	If using MoviePy to apply disintegration/reintegration effects, save the final video to the uploads folder and provide a download link.
+________________________________________
+8. Handle File Uploads
+1.	Image Uploads:
+o	Accept and save user-uploaded images in the /uploads folder.
+o	Resize or process images if needed before passing them to the Gemini API.
+2.	Background Music Upload:
+o	Accept and save the uploaded music file in the /uploads folder.
+o	If no music is provided, allow the app to use a default royalty-free background track.
+________________________________________
+9. Test and Debug
+1.	Test Gemini Integration:
+o	Test different text prompts, templates, and image uploads to ensure the generated video is correct.
+2.	Test Image Effects:
+o	Apply the image disintegration and reintegration effects to images and ensure the effects render properly in the video.
+3.	Test Video Customization:
+o	Ensure text overlays, transitions, image effects, and music are applied correctly.
+4.	Test PWA:
+o	Test offline functionality and ensure the app can be installed on mobile devices.
+________________________________________
+10. Deployment
+1.	Deploy the App on Replit:
+o	After testing, deploy the app using Replit Hosting.
+o	Ensure file paths and configurations are correct for production.
+________________________________________
+11. Optional Enhancements
+1.	Advanced Transitions:
+o	Add custom transitions, animations, or effects to the generated video.
+2.	AI Image Generation:
+o	Integrate AI services (like DALL·E or DeepAI) to generate promotional images from text.
+3.	UI Enhancements:
+o	Improve the user interface (UI) design to make the app more user-friendly, add progress bars, and handle errors gracefully.
+________________________________________
