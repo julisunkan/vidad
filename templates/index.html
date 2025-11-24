@@ -22,7 +22,7 @@
                 <div class="card shadow-lg">
                     <div class="card-body p-4">
                         <h2 class="card-title mb-4">Create Your Video Ad</h2>
-                        
+
                         <!-- Mode Selector -->
                         <div class="mb-4">
                             <label class="form-label fw-bold">Generation Mode</label>
@@ -31,7 +31,7 @@
                                 <label class="btn btn-outline-primary" for="templateMode">
                                     📝 Template-Based
                                 </label>
-                                
+
                                 <input type="radio" class="btn-check" name="generationMode" id="soraMode" value="sora">
                                 <label class="btn btn-outline-primary" for="soraMode">
                                     🤖 Sora AI Generation
@@ -41,7 +41,7 @@
                                 <span id="modeDescription">Use pre-built templates with images and text overlays</span>
                             </small>
                         </div>
-                        
+
                         <form id="videoForm" enctype="multipart/form-data">
                             <!-- Template-Based Fields -->
                             <div id="templateFields">
@@ -92,7 +92,7 @@
                             </div>
                             </div>
                             <!-- End Template Fields -->
-                            
+
                             <!-- Sora AI Fields -->
                             <div id="soraFields" style="display: none;">
                                 <div class="mb-4">
@@ -102,12 +102,12 @@
                                         <option value="replicate" selected>Replicate SVD (Budget, ~$0.006/sec)</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="alert alert-info" id="providerInfo">
                                     <strong>💡 Replicate (Free tier available):</strong> Get API key at replicate.com. 
                                     Free $5 credits to start. Cost: ~$0.006 per second of video.
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label for="soraPrompt" class="form-label fw-bold">Video Description</label>
                                     <textarea class="form-control" id="soraPrompt" rows="4" 
@@ -116,7 +116,7 @@
                                         Be specific about camera angles, lighting, style, and movement for best results.
                                     </small>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label for="soraDuration" class="form-label fw-bold">Duration (seconds)</label>
                                     <input type="range" class="form-range" id="soraDuration" min="4" max="12" value="8" step="4">
@@ -127,7 +127,7 @@
                                     </div>
                                     <small class="form-text text-muted">Sora supports 4, 8, or 12 second videos</small>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label for="soraSize" class="form-label fw-bold">Video Size</label>
                                     <select class="form-select" id="soraSize">

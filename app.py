@@ -59,20 +59,20 @@ def generate_video_route():
         template_id_str = request.form.get('template_id')
         if not template_id_str:
             return jsonify({'error': 'Template ID is required'}), 400
-        
+
         template_id = int(template_id_str)
         selected_prompt = request.form.get('text_prompt', '')
         custom_text = request.form.get('custom_text', '')
         background_color = request.form.get('background_color', '#1e3c72')
-        
+
         # Convert hex color to RGB tuple
         bg_color_hex = background_color.lstrip('#')
         bg_color_rgb = tuple(int(bg_color_hex[i:i+2], 16) for i in (0, 2, 4))
-        
+
         template = next((t for t in VIDEO_TEMPLATES if t['id'] == template_id), None)
         if not template:
             return jsonify({'error': 'Invalid template selected'}), 400
-        
+
         uploaded_images = []
         for i in range(template['image_slots']):
             file_key = f'image_{i}'
@@ -83,7 +83,7 @@ def generate_video_route():
                     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     file.save(filepath)
                     uploaded_images.append(filepath)
-        
+
         audio_file = None
         if 'background_music' in request.files:
             file = request.files['background_music']
@@ -92,7 +92,7 @@ def generate_video_route():
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
                 audio_file = filepath
-        
+
         text_overlays = []
         for slot in template['text_slots']:
             text = slot['text']
@@ -111,10 +111,10 @@ def generate_video_route():
                 'start': slot['start'],
                 'duration': slot['duration']
             })
-        
+
         video_filename = f"video_{uuid.uuid4()}.mp4"
         video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
-        
+
         generate_video(
             template=template,
             images=uploaded_images,
@@ -123,15 +123,15 @@ def generate_video_route():
             output_path=video_path,
             background_color=bg_color_rgb
         )
-        
+
         session['last_video'] = video_filename
-        
+
         return jsonify({
             'success': True,
             'video_url': f'/download_video/{video_filename}',
             'message': 'Video generated successfully!'
         })
-        
+
     except Exception as e:
         print(f"Error generating video: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -163,34 +163,34 @@ def generate_sora_video_route():
         data = request.get_json()
         if not data:
             return jsonify({'error': 'Invalid JSON request body'}), 400
-        
+
         prompt = data.get('prompt', '')
         try:
             duration = int(data.get('duration', 8))
         except (ValueError, TypeError):
             return jsonify({'error': 'Invalid duration value'}), 400
-            
+
         size = data.get('size', '1280x720')
         use_image = data.get('use_image', False)
         api_provider = data.get('api_provider', 'sora')
         openai_api_key = data.get('openai_api_key', '')
         replicate_api_key = data.get('replicate_api_key', '')
-        
+
         if not prompt:
             return jsonify({'error': 'Prompt is required'}), 400
-        
+
         duration = max(4, min(20, duration))
-        
+
         video_filename = f"sora_{uuid.uuid4()}.mp4"
         video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
-        
+
         if use_image and 'image' in request.files:
             image_file = request.files['image']
             if image_file and image_file.filename:
                 image_filename = secure_filename(f"{uuid.uuid4()}_{image_file.filename}")
                 image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
                 image_file.save(image_path)
-                
+
                 result = generate_video_with_image(
                     prompt=prompt,
                     image_path=image_path,
@@ -198,7 +198,7 @@ def generate_sora_video_route():
                     size=size,
                     output_path=video_path
                 )
-                
+
                 try:
                     os.remove(image_path)
                 except:
@@ -222,7 +222,7 @@ def generate_sora_video_route():
                     output_path=video_path,
                     api_key=openai_api_key
                 )
-        
+
         if result['success']:
             session['last_video'] = video_filename
             return jsonify({
@@ -233,7 +233,7 @@ def generate_sora_video_route():
             })
         else:
             return jsonify({'error': result['error']}), 500
-    
+
     except Exception as e:
         print(f"Error generating Sora video: {str(e)}")
         return jsonify({'error': str(e)}), 500
