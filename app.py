@@ -143,8 +143,15 @@ def generate_sora_video_route():
     """Generate video using OpenAI Sora API"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON request body'}), 400
+        
         prompt = data.get('prompt', '')
-        duration = int(data.get('duration', 8))
+        try:
+            duration = int(data.get('duration', 8))
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Invalid duration value'}), 400
+            
         size = data.get('size', '1280x720')
         use_image = data.get('use_image', False)
         
