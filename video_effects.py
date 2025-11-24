@@ -34,7 +34,7 @@ def apply_fade_out(clip, duration=1):
 def apply_zoom_effect(clip, zoom_factor=1.5):
     def zoom(t):
         scale = 1 + (zoom_factor - 1) * (t / clip.duration)
-        return clip.resize(scale).set_position('center')
+        return clip.resized(scale).with_position('center')
     
     return clip.fl(lambda gf, t: zoom(t).get_frame(t), apply_to=[])
 
@@ -42,21 +42,21 @@ def apply_slide_effect(clip, direction='right'):
     w, h = clip.size
     
     if direction == 'right':
-        return clip.set_position(lambda t: (int(-w + w * t / clip.duration), 'center'))
+        return clip.with_position(lambda t: (int(-w + w * t / clip.duration), 'center'))
     elif direction == 'left':
-        return clip.set_position(lambda t: (int(w - w * t / clip.duration), 'center'))
+        return clip.with_position(lambda t: (int(w - w * t / clip.duration), 'center'))
     elif direction == 'down':
-        return clip.set_position(lambda t: ('center', int(-h + h * t / clip.duration)))
+        return clip.with_position(lambda t: ('center', int(-h + h * t / clip.duration)))
     else:
-        return clip.set_position(lambda t: ('center', int(h - h * t / clip.duration)))
+        return clip.with_position(lambda t: ('center', int(h - h * t / clip.duration)))
 
 def apply_disintegrate_effect(image_path, duration=3, size=(1280, 720)):
-    clip = ImageClip(image_path, duration=duration).resize(size)
+    clip = ImageClip(image_path).with_duration(duration).resized(size)
     clip = clip.fadeout(duration * 0.8)
     return clip
 
 def apply_reintegrate_effect(image_path, duration=3, size=(1280, 720)):
-    clip = ImageClip(image_path, duration=duration).resize(size)
+    clip = ImageClip(image_path).with_duration(duration).resized(size)
     clip = clip.fadein(duration * 0.8)
     return clip
 

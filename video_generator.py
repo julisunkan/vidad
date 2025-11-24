@@ -28,13 +28,14 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
                 continue
             
             try:
-                img_clip = ImageClip(img_path, duration=img_duration)
-                img_clip = img_clip.resize(height=video_size[1] * 0.6)
+                img_clip = ImageClip(img_path)
+                img_clip = img_clip.with_duration(img_duration)
+                img_clip = img_clip.resized(height=video_size[1] * 0.6)
                 
                 if img_clip.w > video_size[0]:
-                    img_clip = img_clip.resize(width=video_size[0] * 0.8)
+                    img_clip = img_clip.resized(width=video_size[0] * 0.8)
                 
-                img_clip = img_clip.set_position('center').set_start(start_time)
+                img_clip = img_clip.with_position('center').with_start(start_time)
                 
                 effects = template.get('effects', [])
                 if i < len(effects):
@@ -76,7 +77,7 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
                 bg_color=(0, 0, 0, 0)
             )
             
-            text_clip = text_clip.set_position('center').set_start(start)
+            text_clip = text_clip.with_position('center').with_start(start)
             text_clip = apply_fade_in(text_clip, 0.3)
             text_clip = apply_fade_out(text_clip, 0.3)
             
@@ -87,7 +88,7 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
     
     try:
         final_video = CompositeVideoClip(clips, size=video_size)
-        final_video = final_video.set_duration(duration)
+        final_video = final_video.with_duration(duration)
         
         if audio_file and os.path.exists(audio_file):
             try:
@@ -98,7 +99,7 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
                     loops = int(duration / audio.duration) + 1
                     audio = concatenate_audioclips([audio] * loops).subclip(0, duration)
                 
-                final_video = final_video.set_audio(audio)
+                final_video = final_video.with_audio(audio)
             except Exception as e:
                 print(f"Error adding audio: {e}")
         
