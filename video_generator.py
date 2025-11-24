@@ -1,6 +1,5 @@
 
 from moviepy import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip, ColorClip, concatenate_audioclips
-from moviepy.video.fx import fadein, fadeout
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
@@ -43,15 +42,13 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
                 if i < len(effects):
                     effect = effects[i % len(effects)]
                     if effect == 'disintegrate' and i == 0:
-                        img_clip = img_clip.fx(fadeout, 1)
+                        img_clip = img_clip.fadein(1)
                     elif effect == 'reintegrate':
-                        img_clip = img_clip.fx(fadein, 1)
+                        img_clip = img_clip.fadeout(1)
                     else:
-                        img_clip = img_clip.fx(fadein, 0.5)
-                        img_clip = img_clip.fx(fadeout, 0.5)
+                        img_clip = img_clip.fadein(0.5).fadeout(0.5)
                 else:
-                    img_clip = img_clip.fx(fadein, 0.5)
-                    img_clip = img_clip.fx(fadeout, 0.5)
+                    img_clip = img_clip.fadein(0.5).fadeout(0.5)
                 
                 clips.append(img_clip)
             except Exception as e:
@@ -80,8 +77,7 @@ def generate_video(template, images, text_overlays, audio_file, output_path):
             )
             
             text_clip = text_clip.with_position('center').with_start(start)
-            text_clip = text_clip.fx(fadein, 0.3)
-            text_clip = text_clip.fx(fadeout, 0.3)
+            text_clip = text_clip.fadein(0.3).fadeout(0.3)
             
             clips.append(text_clip)
         except Exception as e:

@@ -1,6 +1,5 @@
 
 from moviepy import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip
-from moviepy.video.fx import fadein, fadeout
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
@@ -28,10 +27,10 @@ def create_text_clip(text, duration, size=(1280, 720), fontsize=60, color='white
     return clip
 
 def apply_fade_in(clip, duration=1):
-    return clip.fx(fadein, duration)
+    return clip.fadein(duration)
 
 def apply_fade_out(clip, duration=1):
-    return clip.fx(fadeout, duration)
+    return clip.fadeout(duration)
 
 def apply_zoom_effect(clip, zoom_factor=1.5):
     def zoom(t):
@@ -54,12 +53,12 @@ def apply_slide_effect(clip, direction='right'):
 
 def apply_disintegrate_effect(image_path, duration=3, size=(1280, 720)):
     clip = ImageClip(image_path).with_duration(duration).resized(size)
-    clip = clip.fx(fadeout, duration * 0.8)
+    clip = clip.fadeout(duration * 0.8)
     return clip
 
 def apply_reintegrate_effect(image_path, duration=3, size=(1280, 720)):
     clip = ImageClip(image_path).with_duration(duration).resized(size)
-    clip = clip.fx(fadein, duration * 0.8)
+    clip = clip.fadein(duration * 0.8)
     return clip
 
 def create_background_clip(duration, size=(1280, 720), color=(30, 60, 114)):
