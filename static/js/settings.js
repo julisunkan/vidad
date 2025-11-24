@@ -9,16 +9,28 @@ const bgColorHex = document.getElementById('bgColorHex');
 const colorPreview = document.getElementById('colorPreview');
 
 bgColor.addEventListener('input', function() {
-    bgColorHex.value = this.value;
-    colorPreview.style.backgroundColor = this.value;
-});
+        const color = this.value;
+        document.getElementById('bgColorHex').value = color;
+        const preview = document.getElementById('colorPreview');
+        preview.style.backgroundColor = color;
+        preview.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            preview.style.transform = 'scale(1)';
+        }, 200);
+    });
 
-bgColorHex.addEventListener('input', function() {
-    if (/^#[0-9A-F]{6}$/i.test(this.value)) {
-        bgColor.value = this.value;
-        colorPreview.style.backgroundColor = this.value;
-    }
-});
+    document.getElementById('bgColorHex').addEventListener('input', function() {
+        const color = this.value;
+        if (/^#[0-9A-F]{6}$/i.test(color)) {
+            document.getElementById('bgColor').value = color;
+            const preview = document.getElementById('colorPreview');
+            preview.style.backgroundColor = color;
+            preview.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                preview.style.transform = 'scale(1)';
+            }, 200);
+        }
+    });
 
 // Show/hide API keys
 document.getElementById('showKeys').addEventListener('change', function() {
