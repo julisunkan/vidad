@@ -58,7 +58,12 @@ document.getElementById('templateSelect').addEventListener('change', function() 
     }
     
     fetch(`/get_template/${templateId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(template => {
             currentTemplate = template;
             
@@ -159,7 +164,12 @@ document.getElementById('videoForm').addEventListener('submit', function(e) {
     }
     
     fetch(endpoint, fetchOptions)
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         document.getElementById('generateBtn').disabled = false;
         document.getElementById('btnText').classList.remove('d-none');
