@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Ads Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">🎬 AI Video Ads Generator</span>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-lg">
+                    <div class="card-body p-4">
+                        <h2 class="card-title mb-4">Create Your Video Ad</h2>
+                        
+                        <form id="videoForm" enctype="multipart/form-data">
+                            <div class="mb-4">
+                                <label for="templateSelect" class="form-label fw-bold">Select Video Template</label>
+                                <select class="form-select" id="templateSelect" name="template_id" required>
+                                    <option value="">Choose a template...</option>
+                                    {% for template in templates %}
+                                    <option value="{{ template.id }}">{{ template.name }} - {{ template.description }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div id="templateInfo" class="alert alert-info d-none mb-4">
+                                <h6 class="fw-bold">Template Details:</h6>
+                                <p id="templateDescription" class="mb-1"></p>
+                                <p class="mb-0"><strong>Duration:</strong> <span id="templateDuration"></span> seconds</p>
+                                <p class="mb-0"><strong>Image Slots:</strong> <span id="templateSlots"></span></p>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="promptSelect" class="form-label fw-bold">Select Text Prompt</label>
+                                <select class="form-select" id="promptSelect" name="text_prompt">
+                                    <option value="">Choose a prompt (optional)...</option>
+                                    {% for prompt in prompts %}
+                                    <option value="{{ prompt }}">{{ prompt }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="customText" class="form-label fw-bold">Custom Text (Optional)</label>
+                                <input type="text" class="form-control" id="customText" name="custom_text" 
+                                       placeholder="Enter your business name, product name, etc.">
+                                <small class="form-text text-muted">This will replace placeholders like [Business Name], [Product Name] in the template.</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="geminiKey" class="form-label fw-bold">Gemini API Key (Optional)</label>
+                                <input type="text" class="form-control" id="geminiKey" name="gemini_api_key" 
+                                       placeholder="Enter your Gemini API key for AI enhancements">
+                                <small class="form-text text-muted">Leave empty to generate video with template defaults.</small>
+                            </div>
+
+                            <div class="mb-4" id="imageUploads">
+                                <label class="form-label fw-bold">Upload Images</label>
+                                <div id="imageInputs"></div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="backgroundMusic" class="form-label fw-bold">Background Music (Optional)</label>
+                                <input type="file" class="form-control" id="backgroundMusic" name="background_music" 
+                                       accept=".mp3,.wav,.ogg,.m4a">
+                                <small class="form-text text-muted">Supported formats: MP3, WAV, OGG, M4A</small>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                    <span id="btnText">Generate Video</span>
+                                    <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="progressSection" class="mt-4 d-none">
+                            <div class="alert alert-info">
+                                <strong>Generating your video...</strong>
+                                <p class="mb-0">This may take a few moments. Please wait.</p>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <div id="resultSection" class="mt-4 d-none">
+                            <div class="alert alert-success">
+                                <h5>Video Generated Successfully! 🎉</h5>
+                            </div>
+                            <div class="ratio ratio-16x9 mb-3">
+                                <video id="videoPreview" controls></video>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a id="downloadLink" class="btn btn-success btn-lg" download>
+                                    Download Video
+                                </a>
+                                <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                                    Create Another Video
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="errorSection" class="mt-4 d-none">
+                            <div class="alert alert-danger">
+                                <strong>Error:</strong> <span id="errorMessage"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 How It Works</h5>
+                        <ol class="mb-0">
+                            <li>Select a video template that matches your needs</li>
+                            <li>Choose a pre-written prompt or enter custom text</li>
+                            <li>Upload images for your video (optional but recommended)</li>
+                            <li>Add background music if desired</li>
+                            <li>Click "Generate Video" and wait for processing</li>
+                            <li>Preview and download your professional video ad!</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
