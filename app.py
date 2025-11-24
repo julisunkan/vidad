@@ -1,0 +1,137 @@
+from flask import Flask, render_template, request, send_file, jsonify, session
+from werkzeug.utils import secure_filename
+import os
+import uuid
+from datetime import datetime
+from templates import VIDEO_TEMPLATES, TEXT_PROMPTS
+from video_generator import generate_video
+import json
+
+app = Flask(__name__)
+app.secret_key = os.environ.get('SESSION_SECRET', 'dev-secret-key-change-in-production')
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
+app.config['ALLOWED_IMAGE_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+app.config['ALLOWED_AUDIO_EXTENSIONS'] = {'mp3', 'wav', 'ogg', 'm4a'}
+
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+def allowed_file(filename, file_type='image'):
+    if '.' not in filename:
+        return False
+    ext = filename.rsplit('.', 1)[1].lower()
+    if file_type == 'image':
+        return ext in app.config['ALLOWED_IMAGE_EXTENSIONS']
+    elif file_type == 'audio':
+        return ext in app.config['ALLOWED_AUDIO_EXTENSIONS']
+    return False
+
+@app.route('/')
+def index():
+    return render_template('index.html', 
+                         templates=VIDEO_TEMPLATES, 
+                         prompts=TEXT_PROMPTS)
+
+@app.route('/get_template/<int:template_id>')
+def get_template(template_id):
+    template = next((t for t in VIDEO_TEMPLATES if t['id'] == template_id), None)
+    if template:
+        return jsonify(template)
+    return jsonify({'error': 'Template not found'}), 404
+
+@app.route('/generate_video', methods=['POST'])
+def generate_video_route():
+    try:
+        template_id = int(request.form.get('template_id'))
+        selected_prompt = request.form.get('text_prompt', '')
+        custom_text = request.form.get('custom_text', '')
+        gemini_api_key = request.form.get('gemini_api_key', '')
+        
+        template = next((t for t in VIDEO_TEMPLATES if t['id'] == template_id), None)
+        if not template:
+            return jsonify({'error': 'Invalid template selected'}), 400
+        
+        uploaded_images = []
+        for i in range(template['image_slots']):
+            file_key = f'image_{i}'
+            if file_key in request.files:
+                file = request.files[file_key]
+                if file and file.filename and allowed_file(file.filename, 'image'):
+                    filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(filepath)
+                    uploaded_images.append(filepath)
+        
+        audio_file = None
+        if 'background_music' in request.files:
+            file = request.files['background_music']
+            if file and file.filename and allowed_file(file.filename, 'audio'):
+                filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                audio_file = filepath
+        
+        text_overlays = []
+        for slot in template['text_slots']:
+            text = slot['text']
+            if '[' in text and ']' in text:
+                if custom_text:
+                    placeholder = text[text.find('[')+1:text.find(']')]
+                    text = text.replace(f'[{placeholder}]', custom_text)
+                else:
+                    text = text.replace('[Business Name]', 'Your Business')
+                    text = text.replace('[Product Name]', 'Product')
+                    text = text.replace('[Service Type]', 'Service')
+                    text = text.replace('[Event Name]', 'Event')
+                    text = text.replace('[App Name]', 'App')
+            text_overlays.append({
+                'text': text,
+                'start': slot['start'],
+                'duration': slot['duration']
+            })
+        
+        video_filename = f"video_{uuid.uuid4()}.mp4"
+        video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
+        
+        generate_video(
+            template=template,
+            images=uploaded_images,
+            text_overlays=text_overlays,
+            audio_file=audio_file,
+            output_path=video_path
+        )
+        
+        session['last_video'] = video_filename
+        
+        return jsonify({
+            'success': True,
+            'video_url': f'/download_video/{video_filename}',
+            'message': 'Video generated successfully!'
+        })
+        
+    except Exception as e:
+        print(f"Error generating video: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/download_video/<filename>')
+def download_video(filename):
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+        if os.path.exists(filepath):
+            return send_file(filepath, as_attachment=True, download_name=filename)
+        return "Video not found", 404
+    except Exception as e:
+        return str(e), 500
+
+@app.route('/preview_video/<filename>')
+def preview_video(filename):
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+        if os.path.exists(filepath):
+            return send_file(filepath, mimetype='video/mp4')
+        return "Video not found", 404
+    except Exception as e:
+        return str(e), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
