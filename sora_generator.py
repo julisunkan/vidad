@@ -11,7 +11,7 @@ def generate_video_with_sora(prompt, duration=8, size="1280x720", output_path="o
     
     Args:
         prompt (str): Text description of the video to generate
-        duration (int): Video duration in seconds (4-20)
+        duration (int): Video duration in seconds (4, 8, or 12)
         size (str): Video resolution ("720x1280", "1280x720", "1080x1920")
         output_path (str): Path to save the generated video
         api_key (str): OpenAI API key (optional, uses environment variable if not provided)
@@ -27,18 +27,34 @@ def generate_video_with_sora(prompt, duration=8, size="1280x720", output_path="o
         }
     
     try:
+        # Validate and convert duration to allowed string values
+        allowed_durations = ['4', '8', '12']
+        if isinstance(duration, int):
+            # Map any duration to nearest allowed value
+            if duration <= 4:
+                duration_str = '4'
+            elif duration <= 8:
+                duration_str = '8'
+            else:
+                duration_str = '12'
+        else:
+            duration_str = str(duration)
+        
+        if duration_str not in allowed_durations:
+            duration_str = '8'  # Default to 8 if invalid
+        
         client = OpenAI(api_key=api_key_to_use)
         
         print(f"Creating Sora video generation job...")
         print(f"Prompt: {prompt}")
-        print(f"Duration: {duration}s, Size: {size}")
+        print(f"Duration: {duration_str}s, Size: {size}")
         
         # Create video generation job
         video = client.videos.create(
             model="sora-2",
             prompt=prompt,
             size=size,
-            seconds=duration
+            seconds=duration_str
         )
         
         print(f"Video ID: {video.id}")
@@ -113,14 +129,14 @@ def generate_video_with_sora(prompt, duration=8, size="1280x720", output_path="o
             }
 
 
-def generate_video_with_image(prompt, image_path, duration=6, size="1280x720", output_path="output.mp4"):
+def generate_video_with_image(prompt, image_path, duration=8, size="1280x720", output_path="output.mp4"):
     """
     Generate a video from an image using OpenAI's Sora API (Image-to-Video)
     
     Args:
         prompt (str): Text description of how the image should animate
         image_path (str): Path to the input image
-        duration (int): Video duration in seconds (4-20)
+        duration (int): Video duration in seconds (4, 8, or 12)
         size (str): Video resolution
         output_path (str): Path to save the generated video
     
@@ -134,18 +150,34 @@ def generate_video_with_image(prompt, image_path, duration=6, size="1280x720", o
         }
     
     try:
+        # Validate and convert duration to allowed string values
+        allowed_durations = ['4', '8', '12']
+        if isinstance(duration, int):
+            if duration <= 4:
+                duration_str = '4'
+            elif duration <= 8:
+                duration_str = '8'
+            else:
+                duration_str = '12'
+        else:
+            duration_str = str(duration)
+        
+        if duration_str not in allowed_durations:
+            duration_str = '8'
+        
         client = OpenAI(api_key=OPENAI_API_KEY)
         
         print(f"Creating Sora image-to-video job...")
         print(f"Image: {image_path}")
         print(f"Prompt: {prompt}")
+        print(f"Duration: {duration_str}s")
         
         with open(image_path, "rb") as img_file:
             video = client.videos.create(
                 model="sora-2",
                 prompt=prompt,
                 size=size,
-                seconds=duration,
+                seconds=duration_str,
                 input_reference=img_file
             )
         
