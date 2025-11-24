@@ -38,6 +38,14 @@ def index():
 def settings():
     return render_template('settings.html')
 
+@app.route('/static/manifest.json')
+def manifest():
+    return send_file('static/manifest.json', mimetype='application/manifest+json')
+
+@app.route('/static/sw.js')
+def service_worker():
+    return send_file('static/sw.js', mimetype='application/javascript')
+
 @app.route('/get_template/<int:template_id>')
 def get_template(template_id):
     template = next((t for t in VIDEO_TEMPLATES if t['id'] == template_id), None)
