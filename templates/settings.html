@@ -31,28 +31,36 @@
                             <div class="mb-5">
                                 <h5 class="mb-3">🔑 API Keys Configuration</h5>
                                 
-                                <div class="alert alert-info">
-                                    <strong>🔒 Secure Configuration:</strong> For security, API keys are managed through Replit Secrets.
+                                <div class="alert alert-warning">
+                                    <strong>⚠️ Session Storage:</strong> API keys entered here are stored only for your current session and will be cleared when you close your browser or logout.
                                     <br><br>
-                                    <strong>How to add your API keys:</strong>
-                                    <ol class="mb-0">
-                                        <li>Click the <strong>🔐 Secrets</strong> tab in the left sidebar (Tools section)</li>
-                                        <li>Add your keys as secrets:
-                                            <ul>
-                                                <li><code>OPENAI_API_KEY</code> - For OpenAI Sora video generation</li>
-                                                <li><code>REPLICATE_API_KEY</code> - For Replicate AI video generation</li>
-                                            </ul>
-                                        </li>
-                                        <li>Save the secrets - they'll be available to the app immediately</li>
-                                    </ol>
+                                    <strong>For permanent storage:</strong> Use Replit Secrets instead (🔐 Secrets tab in left sidebar).
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="openaiApiKey" class="form-label fw-bold">OpenAI API Key (Sora)</label>
+                                    <input type="password" class="form-control" id="openaiApiKey" 
+                                           name="openai_api_key" placeholder="sk-..." autocomplete="off">
+                                    <small class="form-text text-muted">
+                                        Leave empty to use Replit Secrets. Get key at <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>
+                                    </small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="replicateApiKey" class="form-label fw-bold">Replicate API Key</label>
+                                    <input type="password" class="form-control" id="replicateApiKey" 
+                                           name="replicate_api_key" placeholder="r8_..." autocomplete="off">
+                                    <small class="form-text text-muted">
+                                        Leave empty to use Replit Secrets. Get key at <a href="https://replicate.com/account/api-tokens" target="_blank">replicate.com/account/api-tokens</a>
+                                    </small>
                                 </div>
 
                                 <div class="card">
                                     <div class="card-body">
-                                        <h6 class="card-title">Where to get API keys:</h6>
+                                        <h6 class="card-title">Cost Comparison:</h6>
                                         <ul class="mb-0">
-                                            <li><strong>OpenAI (Sora):</strong> <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a> - Cost: ~$0.10-$0.50/sec</li>
-                                            <li><strong>Replicate:</strong> <a href="https://replicate.com/account/api-tokens" target="_blank">replicate.com/account/api-tokens</a> - Free tier available, ~$0.006/sec</li>
+                                            <li><strong>OpenAI (Sora):</strong> ~$0.10-$0.50/sec - High quality</li>
+                                            <li><strong>Replicate:</strong> ~$0.006/sec - Free tier available, good quality</li>
                                         </ul>
                                     </div>
                                 </div>

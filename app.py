@@ -38,6 +38,36 @@ def index():
 def settings():
     return render_template('settings.html')
 
+@app.route('/save_settings', methods=['POST'])
+def save_settings():
+    """Save settings to session"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid request'}), 400
+
+        # Store API keys in session
+        if data.get('openai_api_key'):
+            session['openai_api_key'] = data['openai_api_key']
+        if data.get('replicate_api_key'):
+            session['replicate_api_key'] = data['replicate_api_key']
+        
+        # Background color doesn't need to be in session
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_settings')
+def get_settings():
+    """Get settings from session"""
+    try:
+        return jsonify({
+            'openai_api_key': session.get('openai_api_key', ''),
+            'replicate_api_key': session.get('replicate_api_key', '')
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/static/manifest.json')
 def manifest():
     return send_file('static/manifest.json', mimetype='application/manifest+json')
@@ -182,6 +212,10 @@ def generate_sora_video_route():
         video_filename = f"sora_{uuid.uuid4()}.mp4"
         video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
 
+        # Get session API keys
+        session_openai_key = session.get('openai_api_key')
+        session_replicate_key = session.get('replicate_api_key')
+
         if use_image and 'image' in request.files:
             image_file = request.files['image']
             if image_file and image_file.filename:
@@ -194,7 +228,8 @@ def generate_sora_video_route():
                     image_path=image_path,
                     duration=duration,
                     size=size,
-                    output_path=video_path
+                    output_path=video_path,
+                    session_api_key=session_openai_key
                 )
 
                 try:
@@ -209,14 +244,16 @@ def generate_sora_video_route():
                     prompt=prompt,
                     duration=duration,
                     size=size,
-                    output_path=video_path
+                    output_path=video_path,
+                    session_api_key=session_replicate_key
                 )
             else:
                 result = generate_video_with_sora(
                     prompt=prompt,
                     duration=duration,
                     size=size,
-                    output_path=video_path
+                    output_path=video_path,
+                    session_api_key=session_openai_key
                 )
 
         if result['success']:

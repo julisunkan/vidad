@@ -38,29 +38,55 @@ document.getElementById('settingsForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const settings = {
-        background_color: document.getElementById('bgColor').value
+        background_color: document.getElementById('bgColor').value,
+        openai_api_key: document.getElementById('openaiApiKey').value,
+        replicate_api_key: document.getElementById('replicateApiKey').value
     };
 
-    // Save only non-sensitive settings to localStorage
-    localStorage.setItem('videoGenSettings', JSON.stringify(settings));
+    // Send to server to store in session
+    fetch('/save_settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Save only non-sensitive settings to localStorage
+            localStorage.setItem('videoGenSettings', JSON.stringify({
+                background_color: settings.background_color
+            }));
 
-    // Show success message
-    const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
+            // Show success message
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
 
-    successMessage.classList.remove('d-none');
-    errorMessage.classList.add('d-none');
+            successMessage.classList.remove('d-none');
+            errorMessage.classList.add('d-none');
 
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-        successMessage.classList.add('d-none');
-    }, 3000);
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMessage.classList.add('d-none');
+            }, 3000);
+        } else {
+            throw new Error(data.error || 'Failed to save settings');
+        }
+    })
+    .catch(error => {
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        errorText.textContent = error.message;
+        errorMessage.classList.remove('d-none');
+        document.getElementById('successMessage').classList.add('d-none');
+    });
 });
 
-// Load settings from localStorage
+// Load settings from localStorage and session
 function loadSettings() {
+    // Load background color from localStorage
     const savedSettings = localStorage.getItem('videoGenSettings');
-
     if (savedSettings) {
         try {
             const settings = JSON.parse(savedSettings);
@@ -73,4 +99,19 @@ function loadSettings() {
             console.error('Error loading settings:', e);
         }
     }
+
+    // Load API keys from session
+    fetch('/get_settings')
+        .then(response => response.json())
+        .then(data => {
+            if (data.openai_api_key) {
+                document.getElementById('openaiApiKey').value = data.openai_api_key;
+            }
+            if (data.replicate_api_key) {
+                document.getElementById('replicateApiKey').value = data.replicate_api_key;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading session settings:', error);
+        });
 }
