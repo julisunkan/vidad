@@ -107,7 +107,7 @@ document.getElementById('videoForm').addEventListener('submit', function(e) {
         }
     }
     
-    // Load settings from localStorage
+    // Load settings from localStorage (background color only)
     const savedSettings = localStorage.getItem('videoGenSettings');
     let settings = {};
     if (savedSettings) {
@@ -137,9 +137,7 @@ document.getElementById('videoForm').addEventListener('submit', function(e) {
             duration: parseInt(document.getElementById('soraDuration').value),
             size: document.getElementById('soraSize').value,
             use_image: false,
-            api_provider: apiProvider,
-            openai_api_key: settings.openai_api_key || '',
-            replicate_api_key: settings.replicate_api_key || ''
+            api_provider: apiProvider
         };
         requestBody = JSON.stringify(soraData);
     }

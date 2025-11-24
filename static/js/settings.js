@@ -32,34 +32,16 @@ bgColor.addEventListener('input', function() {
         }
     });
 
-// Show/hide API keys
-document.getElementById('showKeys').addEventListener('change', function() {
-    const openaiKey = document.getElementById('openaiKey');
-    const geminiKey = document.getElementById('geminiKey');
-    const replicateKey = document.getElementById('replicateKey');
-
-    if (this.checked) {
-        openaiKey.type = 'text';
-        geminiKey.type = 'text';
-        replicateKey.type = 'text';
-    } else {
-        openaiKey.type = 'password';
-        geminiKey.type = 'password';
-        replicateKey.type = 'password';
-    }
-});
 
 // Save settings
 document.getElementById('settingsForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const settings = {
-        openai_api_key: document.getElementById('openaiKey').value,
-        replicate_api_key: document.getElementById('replicateKey').value,
         background_color: document.getElementById('bgColor').value
     };
 
-    // Save to localStorage
+    // Save only non-sensitive settings to localStorage
     localStorage.setItem('videoGenSettings', JSON.stringify(settings));
 
     // Show success message
@@ -82,12 +64,6 @@ function loadSettings() {
     if (savedSettings) {
         try {
             const settings = JSON.parse(savedSettings);
-            if (settings.openai_api_key) {
-                document.getElementById('openaiKey').value = settings.openai_api_key;
-            }
-            if (settings.replicate_api_key) {
-                document.getElementById('replicateKey').value = settings.replicate_api_key;
-            }
             if (settings.background_color) {
                 document.getElementById('bgColor').value = settings.background_color;
                 document.getElementById('bgColorHex').value = settings.background_color;

@@ -14,8 +14,16 @@ A powerful web application that generates professional video advertisements usin
 
 ## 🚀 Getting Started
 
+### Prerequisites
+
+**For AI Video Generation (Optional)**:
+- You'll need API keys from OpenAI or Replicate
+- See [API_KEYS_SETUP.md](API_KEYS_SETUP.md) for detailed setup instructions
+- Template-based generation works WITHOUT any API keys
+
 ### How to Use
 
+#### Template-Based Video Generation (No API Keys Required)
 1. **Select a Template**: Choose from 10 professionally designed video templates
 2. **Pick a Prompt**: Select from 50+ pre-written prompts or leave blank for defaults
 3. **Add Custom Text**: Enter your business name, product name, etc. to personalize the video
@@ -23,6 +31,14 @@ A powerful web application that generates professional video advertisements usin
 5. **Add Music** (Optional): Upload background music to enhance your video
 6. **Generate**: Click "Generate Video" and wait 10-30 seconds for processing
 7. **Preview & Download**: Watch your video and download when ready
+
+#### AI Video Generation (Requires API Keys)
+1. **Setup API Keys**: Follow instructions in [API_KEYS_SETUP.md](API_KEYS_SETUP.md)
+2. **Select AI Mode**: Choose "Sora AI Generation" mode
+3. **Pick Provider**: OpenAI Sora (high quality) or Replicate (budget-friendly)
+4. **Describe Your Video**: Write a detailed description
+5. **Generate**: Wait 1-5 minutes for AI to create your video
+6. **Download**: Get your AI-generated video
 
 ### Template Details
 
@@ -69,9 +85,24 @@ Each template has:
 - **Text Customization**: Use the custom text field to replace placeholders like [Business Name], [Product Name]
 - **Processing Time**: Video generation typically takes 10-60 seconds depending on complexity
 
+## 🤖 AI Features
+
+### OpenAI Sora
+- High-quality AI video generation
+- Cost: ~$0.10-$0.50 per second
+- Best for professional, high-quality ads
+
+### Replicate (Stable Video Diffusion)
+- Budget-friendly AI generation
+- Cost: ~$0.006 per second
+- Free tier with $5 credits
+- Great for testing and prototypes
+
+### Security
+🔒 **API keys are securely managed using Replit Secrets** - they never touch your browser and are encrypted server-side.
+
 ## 🔧 Advanced Features (Coming Soon)
 
-- Gemini API integration for AI-enhanced content suggestions
 - Advanced image disintegration/reintegration particle effects
 - Custom font selection
 - Video length customization

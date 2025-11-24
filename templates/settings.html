@@ -29,34 +29,32 @@
                         <form id="settingsForm">
                             <!-- API Keys Section -->
                             <div class="mb-5">
-                                <h5 class="mb-3">🔑 API Keys</h5>
-
-                                <div class="mb-4">
-                                    <label for="openaiKey" class="form-label fw-bold">OpenAI API Key (Sora)</label>
-                                    <input type="password" class="form-control" id="openaiKey" name="openai_api_key" 
-                                           placeholder="sk-proj-...">
-                                    <small class="form-text text-muted">
-                                        Required for Sora AI video generation. Get your key at 
-                                        <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>
-                                    </small>
+                                <h5 class="mb-3">🔑 API Keys Configuration</h5>
+                                
+                                <div class="alert alert-info">
+                                    <strong>🔒 Secure Configuration:</strong> For security, API keys are managed through Replit Secrets.
+                                    <br><br>
+                                    <strong>How to add your API keys:</strong>
+                                    <ol class="mb-0">
+                                        <li>Click the <strong>🔐 Secrets</strong> tab in the left sidebar (Tools section)</li>
+                                        <li>Add your keys as secrets:
+                                            <ul>
+                                                <li><code>OPENAI_API_KEY</code> - For OpenAI Sora video generation</li>
+                                                <li><code>REPLICATE_API_KEY</code> - For Replicate AI video generation</li>
+                                            </ul>
+                                        </li>
+                                        <li>Save the secrets - they'll be available to the app immediately</li>
+                                    </ol>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label for="replicateKey" class="form-label fw-bold">Replicate API Key</label>
-                                    <input type="password" class="form-control" id="replicateKey" name="replicate_api_key" 
-                                           placeholder="r8_...">
-                                    <small class="form-text text-muted">
-                                        For budget AI generation (e.g., Stable Video Diffusion). Get your key at 
-                                        <a href="https://replicate.com/account/api-tokens" target="_blank">replicate.com</a>. 
-                                        Offers a free tier with limited credits (~$0.006/sec).
-                                    </small>
-                                </div>
-
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="showKeys">
-                                    <label class="form-check-label" for="showKeys">
-                                        Show API keys
-                                    </label>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Where to get API keys:</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>OpenAI (Sora):</strong> <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a> - Cost: ~$0.10-$0.50/sec</li>
+                                            <li><strong>Replicate:</strong> <a href="https://replicate.com/account/api-tokens" target="_blank">replicate.com/account/api-tokens</a> - Free tier available, ~$0.006/sec</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
 
@@ -102,11 +100,11 @@
 
                 <div class="card shadow-sm mt-4">
                     <div class="card-body">
-                        <h5 class="card-title">ℹ️ About API Keys</h5>
+                        <h5 class="card-title">ℹ️ About Security</h5>
                         <ul class="mb-0">
-                            <li><strong>OpenAI Sora:</strong> Required for AI-powered video generation. Cost: ~$0.10-$0.50 per second of video.</li>
-                            <li><strong>Replicate (Stable Video Diffusion):</strong> An affordable alternative for AI video generation. Offers a free tier with limited credits. Cost: ~$0.006 per second of video.</li>
-                            <li><strong>Security:</strong> Your API keys are stored securely in your browser's local storage and are never sent to our servers except when making API calls.</li>
+                            <li><strong>🔒 Secure Storage:</strong> API keys are stored server-side using Replit's encrypted Secrets management.</li>
+                            <li><strong>🔐 No Browser Storage:</strong> Keys never touch your browser's localStorage, protecting against XSS attacks.</li>
+                            <li><strong>✅ Best Practice:</strong> This is the recommended way to handle sensitive credentials in web applications.</li>
                         </ul>
                     </div>
                 </div>
@@ -132,19 +130,6 @@
     <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
     <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
     <script>
-        // Show/hide API keys
-        document.getElementById('showKeys').addEventListener('change', function() {
-            const openaiKey = document.getElementById('openaiKey');
-            const replicateKey = document.getElementById('replicateKey');
-
-            if (this.checked) {
-                openaiKey.type = 'text';
-                replicateKey.type = 'text';
-            } else {
-                openaiKey.type = 'password';
-                replicateKey.type = 'password';
-            }
-        });
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/sw.js')
                 .then(reg => console.log('Service Worker registered'))

@@ -3,9 +3,7 @@ import os
 import time
 import replicate
 
-REPLICATE_API_KEY = os.environ.get("REPLICATE_API_KEY")
-
-def generate_video_with_replicate(prompt, duration=4, size="1280x720", output_path="output.mp4", api_key=None):
+def generate_video_with_replicate(prompt, duration=4, size="1280x720", output_path="output.mp4"):
     """
     Generate a video using Replicate's Stable Video Diffusion
     
@@ -14,20 +12,19 @@ def generate_video_with_replicate(prompt, duration=4, size="1280x720", output_pa
         duration (int): Video duration in seconds (2-4 recommended)
         size (str): Video resolution
         output_path (str): Path to save the generated video
-        api_key (str): Replicate API key (optional)
     
     Returns:
         dict: Result with status and video path or error message
     """
-    api_key_to_use = api_key or REPLICATE_API_KEY
-    if not api_key_to_use:
+    replicate_api_key = os.environ.get("REPLICATE_API_KEY")
+    if not replicate_api_key:
         return {
             'success': False,
             'error': 'REPLICATE_API_KEY not found. Please add your Replicate API key in Secrets.'
         }
     
     try:
-        os.environ["REPLICATE_API_TOKEN"] = api_key_to_use
+        os.environ["REPLICATE_API_TOKEN"] = replicate_api_key
         
         # Map size to aspect ratio
         width, height = map(int, size.split('x'))
@@ -109,14 +106,15 @@ def generate_video_with_replicate_img2vid(prompt, image_path, duration=4, output
     Returns:
         dict: Result with status and video path or error message
     """
-    if not REPLICATE_API_KEY:
+    replicate_api_key = os.environ.get("REPLICATE_API_KEY")
+    if not replicate_api_key:
         return {
             'success': False,
             'error': 'REPLICATE_API_KEY not found. Please add your Replicate API key in Secrets.'
         }
     
     try:
-        os.environ["REPLICATE_API_TOKEN"] = REPLICATE_API_KEY
+        os.environ["REPLICATE_API_TOKEN"] = replicate_api_key
         
         print(f"Creating Replicate image-to-video job...")
         print(f"Image: {image_path}")
