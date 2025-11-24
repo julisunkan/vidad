@@ -1,4 +1,4 @@
-from moviepy.editor import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip, ColorClip
+from moviepy import ImageClip, TextClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip, ColorClip
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
